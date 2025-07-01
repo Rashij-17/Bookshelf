@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Explore | The Book Attic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Special+Elite&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Playfair Display', serif;
+      background: url("explorebck.png") no-repeat center center fixed;
+      background-size: cover;
+      color: #3e2f1c;
+    }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(248, 241, 230, 0.92);
+      z-index: -1;
+    }
+    header {
+      text-align: center;
+      padding: 2.5rem 1rem 1rem;
+    }
+    header h1 {
+      font-family: 'Special Elite', cursive;
+      font-size: 2.8rem;
+      color: #5a4033;
+      margin-bottom: 0.3rem;
+      letter-spacing: 1px;
+    }
+    header p {
+      color: #6a5340;
+      font-size: 1.15rem;
+      letter-spacing: 0.5px;
+    }
+    .navbar {
+      background-color: #2e2213;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Playfair Display', serif;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 3px solid #c0a177;
+    }
+    .nav-brand {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f5e6cc;
+      font-family: 'Special Elite', cursive;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      margin: 0;
+    }
+    .nav-links li a {
+      text-decoration: none;
+      font-size: 1.1rem;
+      color: #e8c59a;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .nav-links li a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 0%;
+      height: 2px;
+      background-color: #d6b17e;
+      transition: width 0.3s ease;
+    }
+    .nav-links li a:hover {
+      color: #ffeccc;
+    }
+    .nav-links li a:hover::after {
+      width: 100%;
+    }
+    .genre-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1300px;
+      margin: auto;
+    }
+    .genre-card {
+      background: rgba(255, 248, 229, 0.97);
+      border: 2px solid #c2a07e;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(100, 80, 60, 0.18);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .genre-title {
+      font-size: 1.7rem;
+      margin-bottom: 1rem;
+      color: #7c4b27;
+      border-bottom: 2px dashed #d6b89f;
+      padding-bottom: 8px;
+      font-family: 'Special Elite', cursive;
+      text-align: center;
+    }
+    .book {
+      margin: 12px 0;
+      cursor: pointer;
+    }
+    .book .title {
+      font-size: 1rem;
+      color: #543d2d;
+      text-decoration: underline;
+    }
+    .description-box {
+      background: #f9efe1;
+      border-left: 4px solid #b88b64;
+      padding: 10px 14px;
+      margin-top: 6px;
+      font-size: 0.95rem;
+      color: #5a4033;
+      border-radius: 8px;
+      display: none;
+    }
+    .description-box.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <nav class="navbar">
+    <div class="nav-brand">The Book Attic</div>
+    <ul class="nav-links">
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="knowyourauthor.html">Know Your Author</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+    </ul>
+  </nav>
+  <header>
+    <h1>✨ Explore the Attic</h1>
+    <p>Discover treasures from every shelf</p>
+  </header>
+  <section class="genre-grid" id="genre-grid"></section>
+  <script>
+    const genreGrid = document.getElementById("genre-grid");
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const fn = entry.target.dataset.fn;
+          if (window[fn]) window[fn]();
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: "100px",
+      threshold: 0.1
+    });
+
+    function createGenreCard(genre, books) {
+      const card = document.createElement("div");
+      card.className = "genre-card";
+      const title = document.createElement("div");
+      title.className = "genre-title";
+      title.textContent = genre;
+      card.appendChild(title);
+
+      books.forEach(bookTitle => {
+        const bookContainer = document.createElement("div");
+        bookContainer.className = "book";
+
+        const titleRow = document.createElement("div");
+        titleRow.className = "book-row";
+        titleRow.style.display = "flex";
+        titleRow.style.alignItems = "center";
+        titleRow.style.gap = "12px";
+        titleRow.style.cursor = "pointer";
+
+        const img = document.createElement("img");
+        img.src = "https://via.placeholder.com/50x70?text=Book";
+        img.alt = bookTitle;
+        img.loading = "lazy";
+        img.style.width = "50px";
+        img.style.height = "70px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "4px";
+        img.style.boxShadow = "1px 2px 6px rgba(0,0,0,0.2)";
+
+        const titleSpan = document.createElement("div");
+        titleSpan.className = "title";
+        titleSpan.textContent = bookTitle;
+
+        const description = document.createElement("div");
+        description.className = "description-box";
+        description.textContent = "";
+
+        titleRow.onclick = async () => {
+          if (!description.classList.contains("show")) {
+            description.textContent = "Loading description...";
+            try {
+              const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(bookTitle)}&maxResults=1`);
+              const data = await res.json();
+              const book = data?.items?.[0];
+              const desc = book?.volumeInfo?.description || "No description available.";
+              const image = book?.volumeInfo?.imageLinks?.thumbnail?.replace("http://", "https://");
+              if (image) img.src = image;
+              description.textContent = desc.length > 250 ? desc.substring(0, 250) + "..." : desc;
+            } catch {
+              description.textContent = "Failed to fetch description.";
+            }
+            description.classList.add("show");
+          } else {
+            description.classList.remove("show");
+          }
+        };
+
+        titleRow.appendChild(img);
+        titleRow.appendChild(titleSpan);
+        bookContainer.appendChild(titleRow);
+        bookContainer.appendChild(description);
+        card.appendChild(bookContainer);
+      });
+
+      return card;
+    }
+
+    const genreChunks = Object.entries({
+  "Fiction": [
+    "To Kill a Mockingbird", "The Great Gatsby", "1984", "Pride and Prejudice", "The Catcher in the Rye",
+    "Jane Eyre", "The Alchemist", "The Book Thief", "The Kite Runner", "Little Women",
+    "Wuthering Heights", "Brave New World", "Frankenstein", "Of Mice and Men", "A Tale of Two Cities",
+    "The Picture of Dorian Gray", "Beloved", "Slaughterhouse-Five", "One Hundred Years of Solitude", "The Road"
+  ],
+  "Non-Fiction": [
+    "Sapiens", "Educated", "Becoming", "The Immortal Life of Henrietta Lacks", "Quiet",
+    "The Wright Brothers", "Outliers", "Thinking, Fast and Slow", "The Body Keeps the Score", "Bad Blood",
+    "Into the Wild", "The Sixth Extinction", "Guns, Germs, and Steel", "Hidden Figures", "A Short History of Nearly Everything",
+    "No Logo", "The Omnivore's Dilemma", "The Power of Habit", "Why We Sleep", "The Soul of America"
+  ],
+  "Science": [
+    "A Brief History of Time", "The Selfish Gene", "The Elegant Universe", "Cosmos", "The Gene",
+    "Astrophysics for People in a Hurry", "The Grand Design", "The Origin of Species", "The Order of Time", "The Fabric of the Cosmos",
+    "The Demon-Haunted World", "Parallel Worlds", "Physics of the Impossible", "Surely You're Joking, Mr. Feynman!", "What If?",
+    "The Big Picture", "Chaos", "The Universe in a Nutshell", "The Disappearing Spoon", "The Hidden Life of Trees"
+  ],
+  "Horror": [
+    "It", "The Shining", "Dracula", "Pet Sematary", "The Haunting of Hill House",
+    "Bird Box", "The Exorcist", "Carrie", "The Silence of the Lambs", "The Turn of the Screw",
+    "Hell House", "House of Leaves", "Coraline", "Let the Right One In", "World War Z",
+    "Mexican Gothic", "The Girl with All the Gifts", "Doctor Sleep", "The Amityville Horror", "The Ruins"
+  ],
+  "Thriller": [
+    "Gone Girl", "The Girl on the Train", "The Da Vinci Code", "Before I Go to Sleep", "Shutter Island",
+    "The Silent Patient", "Behind Closed Doors", "The Woman in the Window", "The Couple Next Door", "The Reversal",
+    "The Firm", "I Am Watching You", "The Girl with the Dragon Tattoo", "The Girl Who Played with Fire", "The Guest List",
+    "Verity", "The Family Upstairs", "The Kind Worth Killing", "The Chain", "Lock Every Door"
+  ],
+  "Romance": [
+    "Pride and Prejudice", "Me Before You", "Outlander", "The Notebook", "It Ends with Us",
+    "The Fault in Our Stars", "The Time Traveler's Wife", "The Rosie Project", "Red, White & Royal Blue", "Beach Read",
+    "People We Meet on Vacation", "The Hating Game", "Eleanor & Park", "Twilight", "Beautiful Disaster",
+    "Love and Other Words", "The Love Hypothesis", "The Spanish Love Deception", "The Kiss Quotient", "November 9"
+  ],
+  "History": [
+    "The Diary of a Young Girl", "Guns, Germs, and Steel", "A People's History of the United States", "1776", "The Silk Roads",
+    "The Warmth of Other Suns", "The History of the Ancient World", "Team of Rivals", "The Wright Brothers", "Destiny of the Republic",
+    "The Splendid and the Vile", "The Liberation Trilogy", "Catherine the Great", "Gulag", "The Crusades",
+    "The Romanovs", "The Immortal Irishman", "SPQR", "The Last Tsar", "Postwar"
+  ],
+  "Geopolitics": [
+    "Prisoners of Geography", "The Revenge of Geography", "The Grand Chessboard", "World Order", "Superpower Showdown",
+    "Destiny Disrupted", "The Future is Asian", "On China", "The Tragedy of Great Power Politics", "The Post-American World",
+    "The Cold War", "Great Powers and Geopolitical Change", "The Next 100 Years", "The Accidental Superpower", "Geopolitics for Investors",
+    "Globalization and Its Discontents", "The World Is Flat", "Diplomacy", "Collapse", "Connectography"
+  ],
+  "Self-Help": [
+    "Atomic Habits", "The 7 Habits of Highly Effective People", "Think and Grow Rich", "The Power of Now", "How to Win Friends and Influence People",
+    "The Subtle Art of Not Giving a F*ck", "You Are a Badass", "Mindset", "Can't Hurt Me", "Grit",
+    "Deep Work", "Make Your Bed", "Start with Why", "The Four Agreements", "Daring Greatly",
+    "Awaken the Giant Within", "Drive", "Essentialism", "Who Moved My Cheese?", "Ikigai"
+  ],
+  "Documentary": [
+    "13th", "The Fog of War", "Bowling for Columbine", "Blackfish", "Citizenfour",
+    "The Cove", "Inside Job", "Super Size Me", "Won’t You Be My Neighbor?", "Searching for Sugar Man",
+    "Jiro Dreams of Sushi", "The Social Dilemma", "An Inconvenient Truth", "Amy", "The Act of Killing",
+    "For Sama", "The Great Hack", "The Rescue", "Three Identical Strangers", "Fahrenheit 9/11"
+  ],
+  "Biography": [
+    "Steve Jobs", "Einstein: His Life and Universe", "Alexander Hamilton", "Churchill: A Life", "Leonardo da Vinci",
+    "The Wright Brothers", "Long Walk to Freedom", "John Adams", "Marie Curie: A Life", "The Snowball: Warren Buffett",
+    "Benjamin Franklin: An American Life", "The Diary of Anne Frank", "Catherine the Great", "Cleopatra", "Gandhi: An Autobiography",
+    "Alan Turing: The Enigma", "Elon Musk", "Madame Curie", "When Breath Becomes Air", "Educated"
+  ],
+  "Autobiography": [
+    "The Diary of a Young Girl", "Long Walk to Freedom", "Becoming", "Educated", "The Story of My Experiments with Truth",
+    "I Know Why the Caged Bird Sings", "Born a Crime", "Just as I Am", "Open", "My Life So Far",
+    "On Writing", "The Glass Castle", "This Boy's Life", "Angela’s Ashes", "Bossypants",
+    "Testament of Youth", "Kitchen Confidential", "A Moveable Feast", "Dreams from My Father", "When Breath Becomes Air"
+  ],
+  "Drama": [
+    "A Thousand Splendid Suns", "The Help", "The Color Purple", "The Book Thief", "The Secret Life of Bees",
+    "The Lovely Bones", "The Nightingale", "A Little Life", "Normal People", "Anxious People",
+    "The Paper Palace", "Shatter Me", "Where the Crawdads Sing", "The Midnight Library", "Eleanor Oliphant Is Completely Fine",
+    "Everything I Never Told You", "We Were Liars", "The Light Between Oceans", "Room", "Before We Were Strangers"
+  ],
+  "Plays": [
+    "Hamlet", "Macbeth", "Romeo and Juliet", "Othello", "King Lear",
+    "Death of a Salesman", "The Crucible", "Waiting for Godot", "A Streetcar Named Desire", "The Glass Menagerie",
+    "The Importance of Being Earnest", "Pygmalion", "Antigone", "Medea", "The Tempest",
+    "Twelfth Night", "A Raisin in the Sun", "The Cherry Orchard", "No Exit", "Our Town"
+  ]
+});
+    genreChunks.forEach(([genre, books], index) => {
+      const loader = document.createElement("div");
+      loader.dataset.fn = `loadGenre${index}`;
+      genreGrid.appendChild(loader);
+
+      window[`loadGenre${index}`] = () => {
+        const card = createGenreCard(genre, books);
+        genreGrid.replaceChild(card, loader);
+      };
+
+      observer.observe(loader);
+    });
+  </script>
+</body>
+</html>

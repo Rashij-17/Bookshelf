@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Know Your Author | The Book Attic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet" />
+    <style>
+    body { font-family:'Playfair Display', serif; background:#fdf6ef; color:#3e2f1c; padding:2rem; }
+  .navbar {
+      background-color: #2e2213;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Playfair Display', serif;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 3px solid #c0a177;
+    }
+
+    .nav-brand {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f5e6cc;
+      font-family: 'Special Elite', cursive;
+    }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+  }
+
+  .nav-links li a {
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: #e8c59a;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .nav-links li a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background-color: #d6b17e;
+    transition: width 0.3s ease;
+  }
+
+  .nav-links li a:hover {
+    color: #ffeccc;
+  }
+
+  .nav-links li a:hover::after {
+    width: 100%;
+  }
+    h1 { text-align:center; font-size:2.8rem; margin-bottom:2rem; color:#5a4033; }
+    .author-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.5rem; max-width:1400px; margin:auto; }
+    .author-card { background:#fff6e9; border:1px solid #dec9b1; border-radius:12px; box-shadow:0 6px 18px rgba(100,80,60,0.1);
+      transition:transform .3s,box-shadow .3s; display:flex; flex-direction:column; overflow:hidden; }
+    .author-card:hover { transform:translateY(-5px); box-shadow:0 14px 30px rgba(100,80,60,0.2); }
+    .author-image { height:200px; background:#ccc; display:flex; align-items:center; justify-content:center; }
+    .author-image img { max-height:100%; width:auto; object-fit:contain; }
+    .author-info { padding:1rem; flex-grow:1; display:flex; flex-direction:column; }
+    .author-info h2 { font-size:1.3rem; margin-bottom:.4rem; color:#734b33; }
+    .author-info p { flex-grow:1; font-size:.9rem; line-height:1.4; margin-bottom:.6rem; }
+    .links { margin-top:auto; }
+    .links a { padding:6px 12px; margin-right:8px; background:#c2a07e; color:#fff; text-decoration:none; border-radius:6px; font-size:.9rem; transition:background .3s; }
+    .links a:hover { background:#b88b64; }
+    #works-modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; }
+    .modal-content { background:#fff; border-radius:10px; max-width:800px; width:90%; max-height:80%; overflow:auto; padding:1.5rem; position:relative;}
+    .modal-content h3 { margin-top:0; }
+    .close-btn { position:absolute; top:10px; right:14px; background:#b88b64; color:#fff; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
+    .book-item { margin-bottom:15px; font-size:0.95rem; }
+    .book-item span.year { color:#666; margin-left:6px; font-size:0.85rem; }
+  </style>
+
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">The Book Attic</div>
+  <ul class="nav-links">
+    <li><a href="explore.html">Explore</a></li>
+    <li><a href="knowyourauthor.html">Know Your Author</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+  </ul>
+</nav>
+  <h1>🖋️ Know your Authors</h1>
+  <div class="author-grid" id="author-grid"></div>
+
+  <div id="works-modal" onclick="hideModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="hideModal()">Close</button>
+      <h3 id="works-title"></h3>
+      <ul id="works-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    const authors = [
+      /* 100+ authors including global, Indian, historical — list omitted for brevity */
+      "William Shakespeare","Jane Austen","Charles Dickens","Leo Tolstoy","Gabriel García Márquez",
+      "George Orwell","J.K. Rowling","Agatha Christie","Ernest Hemingway","Colleen Hoover",
+      "Khaled Hosseini","Paulo Coelho","Stephen King","Rick Riordan","Neil Gaiman",
+      "Rabindranath Tagore","Munshi Premchand","Chetan Bhagat","R.K. Narayan","Arundhati Roy",
+      "Vikram Seth","Sudha Murthy","Amish Tripathi","Ashwin Sanghi","Jhumpa Lahiri",
+      "Amitav Ghosh","Ruskin Bond","Khushwant Singh","Amrita Pritam","Devdutt Pattanaik",
+      "Homer","Sophocles","Dante Alighieri","Franz Kafka","Virginia Woolf",
+      "Oscar Wilde","Emily Brontë","Mark Twain","Harper Lee","Emily Dickinson",
+      "Toni Morrison","Margaret Atwood","Paulo Coelho","Dan Brown","Chimamanda Ngozi Adichie",
+      "Maya Angelou","Sylvia Plath","Rumi","Yuval Noah Harari","Doris Kearns Goodwin",
+      "Will Durant","Michelle Obama","John Green","Brandon Sanderson","J.D. Salinger",
+      "Herman Melville","Miguel de Cervantes","Victor Hugo","James Joyce","Arthur Conan Doyle",
+      "John Steinbeck","Sigmund Freud","Karl Marx","Friedrich Nietzsche","Plato",
+      "Aristotle","Socrates","Michel de Montaigne","Voltaire","Jean-Jacques Rousseau",
+      "Geoffrey Chaucer","John Milton","Jonathan Swift","Mary Shelley","Charlotte Brontë",
+      "Henrik Ibsen","Anton Chekhov","Leo Tolstoy","Fyodor Dostoevsky","Ivan Turgenev",
+      "Khaled Hosseini","Michael Crichton","Cormac McCarthy","George R.R. Martin","J.R.R. Tolkien",
+      "E.B. White","Beatrix Potter","Dr. Seuss","Roald Dahl","Stephenie Meyer",
+      "Suzanne Collins","James Patterson","Dean Koontz","Lee Child","Carl Sagan"
+    ];
+
+    const manualWorks = {
+      "William Shakespeare": [{title:"Hamlet",year:"1603"},{title:"Romeo and Juliet",year:"1597"},{title:"Macbeth",year:"1606"}],
+      "Jane Austen": [{title:"Pride and Prejudice",year:"1813"},{title:"Emma",year:"1815"}],
+      "Charles Dickens": [{title:"Great Expectations",year:"1861"},{title:"A Tale of Two Cities",year:"1859"}],
+      "Leo Tolstoy": [{title:"War and Peace",year:"1869"},{title:"Anna Karenina",year:"1877"}],
+      "Gabriel García Márquez": [{title:"One Hundred Years of Solitude",year:"1967"},{title:"Love in the Time of Cholera",year:"1985"}],
+      "George Orwell": [{title:"1984",year:"1949"},{title:"Animal Farm",year:"1945"}],
+      "J.K. Rowling": [{title:"Harry Potter and the Philosopher's Stone",year:"1997"},{title:"Harry Potter and the Deathly Hallows",year:"2007"}],
+      "Agatha Christie": [{title:"Murder on the Orient Express",year:"1934"},{title:"And Then There Were None",year:"1939"}],
+      "Ernest Hemingway": [{title:"The Old Man and the Sea",year:"1952"},{title:"A Farewell to Arms",year:"1929"}],
+      "Colleen Hoover": [{title:"It Ends With Us",year:"2016"},{title:"Verity",year:"2018"}],
+      "Khaled Hosseini": [{title:"The Kite Runner",year:"2003"},{title:"A Thousand Splendid Suns",year:"2007"}],
+      "Paulo Coelho": [{title:"The Alchemist",year:"1988"},{title:"Brida",year:"1990"}],
+      "Stephen King": [{title:"The Shining",year:"1977"},{title:"It",year:"1986"}],
+      "Rick Riordan": [{title:"The Lightning Thief",year:"2005"},{title:"The Sea of Monsters",year:"2006"}],
+      "Neil Gaiman": [{title:"American Gods",year:"2001"},{title:"Coraline",year:"2002"}],
+      "Rabindranath Tagore": [{title:"Gitanjali",year:"1910"},{title:"The Home and the World",year:"1916"}],
+      "Munshi Premchand": [{title:"Godaan",year:"1936"},{title:"Nirmala",year:"1928"}],
+      "Chetan Bhagat": [{title:"Five Point Someone",year:"2004"},{title:"2 States",year:"2009"}],
+      "R.K. Narayan": [{title:"Swami and Friends",year:"1935"},{title:"The Guide",year:"1958"}],
+      "Arundhati Roy": [{title:"The God of Small Things",year:"1997"}],
+      "Vikram Seth": [{title:"A Suitable Boy",year:"1993"}],
+      "Sudha Murthy": [{title:"Wise and Otherwise",year:"2002"}],
+      "Amish Tripathi": [{title:"The Immortals of Meluha",year:"2010"}],
+      "Ashwin Sanghi": [{title:"The Rozabal Line",year:"2007"}],
+      "Jhumpa Lahiri": [{title:"Interpreter of Maladies",year:"1999"}],
+      "Amitav Ghosh": [{title:"The Glass Palace",year:"2000"}],
+      "Ruskin Bond": [{title:"The Room on the Roof",year:"1956"}],
+      "Khushwant Singh": [{title:"Train to Pakistan",year:"1956"}],
+      "Amrita Pritam": [{title:"Pinjar",year:"1950"}],
+      "Devdutt Pattanaik": [{title:"My Gita",year:"2016"}],
+      "Homer": [{title:"The Iliad",year:"circa 8th c BC"},{title:"The Odyssey",year:"circa 8th c BC"}],
+      "Dante Alighieri": [{title:"The Divine Comedy",year:"1320"}],
+      "Homer": [{title:"The Iliad",year:"8th c BC"},{title:"The Odyssey",year:"8th c BC"}],
+      "Sophocles": [{title:"Oedipus Rex",year:"429 BC"}],
+      "Franz Kafka": [{title:"The Trial",year:"1925"},{title:"The Metamorphosis",year:"1915"}],
+      "Virginia Woolf": [{title:"Mrs Dalloway",year:"1925"}],
+      "Oscar Wilde": [{title:"The Picture of Dorian Gray",year:"1890"}],
+      "Emily Brontë": [{title:"Wuthering Heights",year:"1847"}],
+      "Mark Twain": [{title:"Adventures of Huckleberry Finn",year:"1884"}],
+      "Harper Lee": [{title:"To Kill a Mockingbird",year:"1960"}],
+      "Emily Dickinson": [{title:"Various Poems",year:"mid 19th c"}],
+      "Toni Morrison": [{title:"Beloved",year:"1987"}],
+      "Margaret Atwood": [{title:"The Handmaid’s Tale",year:"1985"}],
+      "Maya Angelou": [{title:"I Know Why the Caged Bird Sings",year:"1969"}],
+      "Sylvia Plath": [{title:"The Bell Jar",year:"1963"}],
+      "Rumi": [{title:"Masnavi",year:"1258"}],
+      "Yuval Noah Harari": [{title:"Sapiens",year:"2011"}],
+      "Doris Kearns Goodwin": [{title:"Team of Rivals",year:"2005"}],
+      "Will Durant": [{title:"The Story of Civilization",year:"1935–1975"}],
+      "Dan Brown": [{title:"The Da Vinci Code",year:"2003"}],
+      "Chimamanda Ngozi Adichie": [{title:"Half of a Yellow Sun",year:"2006"}],
+      "Michelle Obama": [{title:"Becoming",year:"2018"}],
+      "John Green": [{title:"The Fault in Our Stars",year:"2012"}],
+      "Brandon Sanderson": [{title:"Mistborn",year:"2006"}],
+      "J.D. Salinger": [{title:"The Catcher in the Rye",year:"1951"}],
+      "Herman Melville": [{title:"Moby‑Dick",year:"1851"}],
+      "Miguel de Cervantes": [{title:"Don Quixote",year:"1605"}],
+      "Victor Hugo": [{title:"Les Misérables",year:"1862"}],
+      "James Joyce": [{title:"Ulysses",year:"1922"}],
+      "Arthur Conan Doyle": [{title:"The Hound of the Baskervilles",year:"1902"}],
+      "John Steinbeck": [{title:"The Grapes of Wrath",year:"1939"}],
+      "Sigmund Freud": [{title:"The Interpretation of Dreams",year:"1899"}],
+      "Karl Marx": [{title:"Das Kapital",year:"1867"}],
+      "Friedrich Nietzsche": [{title:"Thus Spoke Zarathustra",year:"1883"}],
+      "Plato": [{title:"The Republic",year:"c. 375 BC"}],
+      "Aristotle": [{title:"Nicomachean Ethics",year:"c. 350 BC"}],
+      "Michel de Montaigne": [{title:"Essays",year:"1580"}],
+      "Voltaire": [{title:"Candide",year:"1759"}],
+      "Jean-Jacques Rousseau": [{title:"The Social Contract",year:"1762"}],
+      "Geoffrey Chaucer": [{title:"The Canterbury Tales",year:"late 14th c"}],
+      "John Milton": [{title:"Paradise Lost",year:"1667"}],
+      "Jonathan Swift": [{title:"Gulliver's Travels",year:"1726"}],
+      "Mary Shelley": [{title:"Frankenstein",year:"1818"}],
+      "Charlotte Brontë": [{title:"Jane Eyre",year:"1847"}],
+      "Henrik Ibsen": [{title:"A Doll’s House",year:"1879"}],
+      "Anton Chekhov": [{title:"The Cherry Orchard",year:"1904"}],
+      "George R.R. Martin": [{title:"A Game of Thrones",year:"1996"}],
+      "E.B. White": [{title:"Charlotte’s Web",year:"1952"}],
+      "Beatrix Potter": [{title:"The Tale of Peter Rabbit",year:"1902"}],
+      "Dr. Seuss": [{title:"The Cat in the Hat",year:"1957"}],
+      "Roald Dahl": [{title:"Charlie and the Chocolate Factory",year:"1964"}],
+      "Stephenie Meyer": [{title:"Twilight",year:"2005"}],
+      "Suzanne Collins": [{title:"The Hunger Games",year:"2008"}],
+      "James Patterson": [{title:"Along Came a Spider",year:"1993"}],
+      "Dean Koontz": [{title:"Watchers",year:"1987"}],
+      "Lee Child": [{title:"Killing Floor",year:"1997"}],
+      "Carl Sagan": [{title:"Cosmos",year:"1980"}]
+    };
+
+    const worksCache = {};
+
+    authors.forEach(displayAuthor);
+
+    function displayAuthor(name) {
+      fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`)
+        .then(res=>res.ok?res.json():Promise.reject())
+        .then(data => {
+          const div = document.createElement('div');
+          div.className = 'author-card';
+          div.innerHTML = `
+            <div class="author-image">
+              <img src="${data.thumbnail?.source || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${name}">
+            </div>
+            <div class="author-info">
+              <h2>${name}</h2>
+              <p>${data.extract.split('. ').slice(0,2).join('. ')}.</p>
+              <div class="links">
+                <a href="javascript:void(0)" onclick="showWorks('${name}')">Works by</a>
+                <a href="${data.content_urls.desktop.page}" target="_blank">Wikipedia</a>
+              </div>
+            </div>`;
+          document.getElementById('author-grid').appendChild(div);
+        })
+        .catch(console.warn);
+    }
+
+    function showWorks(name) {
+      const modal = document.getElementById('works-modal'),
+            titleEl = document.getElementById('works-title'),
+            list = document.getElementById('works-list');
+
+      titleEl.textContent = `Works by ${name}`;
+      modal.style.display = 'flex';
+
+      if (manualWorks[name]) {
+        return renderWorksList(manualWorks[name]);
+      }
+      if (worksCache[name]) {
+        return renderWorksList(worksCache[name]);
+      }
+
+      list.innerHTML = '<li>Loading...</li>';
+      fetch(`https://en.wikipedia.org/api/rest_v1/page/mobile-sections/${encodeURIComponent(name)}`)
+        .then(res=>res.ok?res.json():Promise.reject())
+        .then(data => {
+          const sec = data.sections.find(sec=>/Notable works|Works|Bibliography/i.test(sec.line));
+          const items = [];
+          if (sec?.text) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = sec.text;
+            tmp.querySelectorAll('li').forEach(li => {
+              const txt = li.textContent.trim();
+              const m = txt.match(/^(.+?)\s*\((\d{3,4}[^)]*)\)/);
+              items.push({title:m?m[1]:txt, year:m?m[2]:""});
+            });
+          }
+          worksCache[name] = items;
+          renderWorksList(items);
+        })
+        .catch(()=>renderWorksList([]));
+    }
+
+    function renderWorksList(arr) {
+      const list = document.getElementById('works-list');
+      list.innerHTML = '';
+      if (!arr.length) {
+        list.innerHTML = '<li>No works found.</li>';
+        return;
+      }
+      arr.forEach(w => {
+        list.innerHTML += `<li class="book-item"><strong>${w.title}</strong>${w.year?` <span class="year">(${w.year})</span>`:""}</li>`;
+      });
+    }
+
+    function hideModal() {
+      document.getElementById('works-modal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
